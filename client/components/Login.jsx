@@ -1,7 +1,12 @@
 import { useState } from "react";
 import axios from "axios";
 
-const Login = ({ setLoginStatus, loginStatus }) => {
+const Login = ({
+  loginStatus,
+  setLoginStatus,
+  setIsAuthenticated,
+  refreshing,
+}) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -13,39 +18,44 @@ const Login = ({ setLoginStatus, loginStatus }) => {
         "http://localhost:4000/auth/login",
         body
       );
-      console.log("result login: ", response.data);
       if (response.data.auth) {
         localStorage.setItem(
-          "acces_token",
+          "access_token",
           "Bearer " + response.data.accessToken
         );
-        console.log("coucou", response.data.accessToken);
         axios.defaults.headers.common[
           "Authorization"
         ] = `Bearer ${response.data.accessToken}`;
         setLoginStatus(true);
       }
     } catch (error) {
-      console.log(error.response);
+      console.log("Error login: ", error.response);
     }
+  };
+
+  const logout = () => {
+    setLoginStatus(false);
+    setIsAuthenticated(false);
+    localStorage.removeItem("access_token");
+    setMessage("");
   };
 
   const userAuthenticated = async () => {
     try {
       const response = await axios.get("http://localhost:4000/auth/isUserAuth");
-      console.log("res auth:", response);
       if (response.status === 200) {
         setMessage(response.data);
+        setIsAuthenticated(true);
+        refreshing();
       } else {
         console.log(response.data.message);
         setMessage(response.data.message);
       }
     } catch (error) {
-      console.log("error auth:", error.response);
+      console.log("Error auth: ", error.response);
     }
   };
 
-  console.log("state login:", email, password);
   return (
     <div className="container">
       <h2>Login</h2>
@@ -67,7 +77,10 @@ const Login = ({ setLoginStatus, loginStatus }) => {
           onChange={(e) => setPassword(e.target.value)}
         />
       </div>
-      <button onClick={login}>Login</button>
+      <div className="btn">
+        <button onClick={login}>Login</button>
+        {loginStatus && <button onClick={logout}>Logout</button>}
+      </div>
       {loginStatus && (
         <button onClick={userAuthenticated}>Check Authentication JWT</button>
       )}

@@ -51,6 +51,11 @@ input {
   border-bottom: 2px solid black;
 }
 
+.btn {
+  display: flex;
+  gap: 15px;
+}
+
 button {
   font-weight: 600;
   padding: 3px 5px;

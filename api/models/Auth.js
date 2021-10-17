@@ -13,7 +13,6 @@ const validate = (data, forCreation = true) => {
 const findUsers = async () => {
   try {
     const users = await db.query("SELECT * FROM user");
-    console.log(users);
     return users[0];
   } catch (error) {
     return Promise.reject(error);

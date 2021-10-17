@@ -9,25 +9,33 @@ import "./App.css";
 function App() {
   const [users, setUsers] = useState([]);
   const [refresh, setRefresh] = useState(false);
-  const [setLoginStatus, loginStatus] = useState({});
+  const [loginStatus, setLoginStatus] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(async () => {
-    const response = await axios.get(`${import.meta.env.VITE_URL}/auth`);
-    setUsers(response.data);
+    if (loginStatus) {
+      const response = await axios.get(`${import.meta.env.VITE_URL}/auth`);
+      setUsers(response.data);
+    }
   }, [refresh]);
 
   const refreshing = () => {
+    console.log("coucou");
     setRefresh(!refresh);
   };
 
   return (
     <div className="App">
-      <Login setLoginStatus={setLoginStatus} loginStatus={loginStatus} />
+      <Login
+        setIsAuthenticated={setIsAuthenticated}
+        setLoginStatus={setLoginStatus}
+        loginStatus={loginStatus}
+        refreshing={refreshing}
+      />
       <Signin refreshing={refreshing} />
       <ul>
-        {users.map((user) => (
-          <li>{user.user_email}</li>
-        ))}
+        {isAuthenticated &&
+          users.map((user) => <li key={user.id}>{user.user_email}</li>)}
       </ul>
     </div>
   );
