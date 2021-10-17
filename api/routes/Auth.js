@@ -10,19 +10,29 @@ const {
 
 authRouter.post("/signin", async (req, res) => {
   const { email, password } = req.body;
+  const validationErrors = null;
   try {
+    validationErrors = Login.validate(req.body);
+    if (validationErrors) throw new Error("INVALID_FORMAT");
     const hashedPassword = await hashPassword(password);
     const results = await Auth.create(email, hashedPassword);
     return res.status(200).json(results);
   } catch (error) {
     console.log(error);
+    if (error.message === "INVALID_FORMAT")
+      return res
+        .status(401)
+        .json({ auth: false, message: "Invalid format credentials" });
     return res.status(500).json(error);
   }
 });
 
 authRouter.post("/login", async (req, res) => {
   const { email, password } = req.body;
+  const validationErrors = null;
   try {
+    validationErrors = Login.validate(req.body);
+    if (validationErrors) throw new Error("INVALID_FORMAT");
     const user = await Auth.findByEmail(email);
     if (!user || user.length <= 0) throw new Error("WRONG_CREDENTIALS");
     const verifyedPassword = await verifyPassword(user.user_password, password);
@@ -43,7 +53,11 @@ authRouter.post("/login", async (req, res) => {
       return res
         .status(401)
         .json({ auth: false, message: "Wrong credentials" });
-    else return res.status(500).json({ auth: false, message: error });
+    else if (error.message === "INVALID_FORMAT")
+      return res
+        .status(401)
+        .json({ auth: false, message: "Invalid format credentials" });
+    return res.status(500).json({ auth: false, message: error });
   }
 });
 
