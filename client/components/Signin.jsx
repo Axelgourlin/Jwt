@@ -10,7 +10,7 @@ const Signin = ({ refreshing }) => {
     const body = { email: email, password: password };
     try {
       const result = await axios.post(
-        "http://localhost:4000/auth/signin",
+        `${import.meta.env.VITE_URL}/auth/signin`,
         body
       );
       console.log("result singin: ", result.data);

@@ -3,16 +3,6 @@ const Auth = require("../models/auth");
 const { hashPassword, verifyPassword } = require("../services/argon2");
 const { createToken, verifyToken } = require("../services/Jwt");
 
-authRouter.get("/", verifyToken, async (req, res) => {
-  try {
-    const results = await Auth.findUsers();
-    return res.status(200).json(results);
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-});
-
 authRouter.post("/signin", async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -51,10 +41,19 @@ authRouter.post("/login", async (req, res) => {
 
 authRouter.get("/isUserAuth", verifyToken, async (req, res) => {
   try {
-    return res.status(200).json("Your Authenticated!");
+    return res.status(200).json("You are Authenticated!");
   } catch (error) {
     return res.status(500).json({ auth: false, message: "Wrong token" });
   }
 });
 
+authRouter.get("/", verifyToken, async (req, res) => {
+  try {
+    const results = await Auth.findUsers();
+    return res.status(200).json(results);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+});
 module.exports = authRouter;

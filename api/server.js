@@ -18,6 +18,11 @@ connection.connect((err) => {
   }
 });
 
+const corsOptions = {
+  origin: "https://localhost:3000",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+};
+
 app.use(cors());
 app.use(morgan("tiny"));
 app.use(express.json());

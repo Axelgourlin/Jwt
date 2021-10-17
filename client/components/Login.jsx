@@ -15,7 +15,7 @@ const Login = ({
     try {
       const body = { email: email, password: password };
       const response = await axios.post(
-        "http://localhost:4000/auth/login",
+        `${import.meta.env.VITE_URL}/auth/login`,
         body
       );
       if (response.data.auth) {
@@ -37,12 +37,15 @@ const Login = ({
     setLoginStatus(false);
     setIsAuthenticated(false);
     localStorage.removeItem("access_token");
+    delete axios.defaults.headers.common["Authorization"];
     setMessage("");
   };
 
   const userAuthenticated = async () => {
     try {
-      const response = await axios.get("http://localhost:4000/auth/isUserAuth");
+      const response = await axios.get(
+        `${import.meta.env.VITE_URL}/auth/isUserAuth`
+      );
       if (response.status === 200) {
         setMessage(response.data);
         setIsAuthenticated(true);
