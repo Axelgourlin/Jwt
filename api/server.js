@@ -3,7 +3,7 @@ const cors = require("cors");
 const morgan = require("morgan");
 const { setupRoutes } = require("./routes/index");
 
-const connection = require("./db-config");
+const connection = require("./config/db-config");
 const app = express();
 
 const PORT = process.env.PORT || 4000;
@@ -17,6 +17,11 @@ connection.connect((err) => {
     );
   }
 });
+
+const corsOptions = {
+  origin: "https://localhost:3000",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+};
 
 app.use(cors());
 app.use(morgan("tiny"));

@@ -1,4 +1,4 @@
-const connection = require("../db-config");
+const connection = require("../config/db-config");
 const Joi = require("joi");
 const db = connection.promise();
 
@@ -24,8 +24,7 @@ const findByEmail = async (email) => {
     const user = await db.query("SELECT * FROM user WHERE user_email = ?", [
       email,
     ]);
-    console.log("findEmail", user[0]);
-    return user[0];
+    return user[0][0];
   } catch (error) {
     return Promise.reject(error);
   }
@@ -42,4 +41,47 @@ const create = async (email, hashedPassword) => {
   }
 };
 
-module.exports = { validate, findUsers, findByEmail, create };
+const storageToken = async (token, user_email) => {
+  try {
+    return await db.query(
+      "UPDATE user SET refresh_token = ? WHERE user_email = ?",
+      [token, user_email]
+    );
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+const findToken = async (token) => {
+  try {
+    const response = await db.query(
+      "SELECT refresh_token FROM user WHERE refresh_token = ?",
+      [token]
+    );
+    return response[0][0];
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+const clearToken = async (token) => {
+  try {
+    const response = await db.query(
+      "UPDATE user SET refresh_token = ? WHERE refresh_token = ?",
+      ["", token]
+    );
+    return response[0];
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+module.exports = {
+  validate,
+  findUsers,
+  findByEmail,
+  findToken,
+  create,
+  storageToken,
+  clearToken,
+};

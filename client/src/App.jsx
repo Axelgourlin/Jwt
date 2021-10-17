@@ -20,7 +20,6 @@ function App() {
   }, [refresh]);
 
   const refreshing = () => {
-    console.log("coucou");
     setRefresh(!refresh);
   };
 

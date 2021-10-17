@@ -10,10 +10,9 @@ const Signin = ({ refreshing }) => {
     const body = { email: email, password: password };
     try {
       const result = await axios.post(
-        "http://localhost:4000/auth/signin",
+        `${import.meta.env.VITE_URL}/auth/signin`,
         body
       );
-      console.log("result singin: ", result.data);
       if (!result.data.affectedRows) {
         setMessage("Error created account");
       }
@@ -21,13 +20,11 @@ const Signin = ({ refreshing }) => {
         setMessage("Successfully created account");
       }
       refreshing();
-      // setResulte(result);
     } catch (error) {
       console.log(error);
     }
   };
 
-  console.log("state signin:", email, password);
   return (
     <div className="container">
       <h2>SignIn</h2>

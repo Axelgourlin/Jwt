@@ -15,17 +15,18 @@ const Login = ({
     try {
       const body = { email: email, password: password };
       const response = await axios.post(
-        "http://localhost:4000/auth/login",
+        `${import.meta.env.VITE_URL}/auth/login`,
         body
       );
       if (response.data.auth) {
         localStorage.setItem(
           "access_token",
-          "Bearer " + response.data.accessToken
+          "Bearer " + response.data.access_token
         );
+        localStorage.setItem("refresh_token", response.data.refresh_token);
         axios.defaults.headers.common[
           "Authorization"
-        ] = `Bearer ${response.data.accessToken}`;
+        ] = `Bearer ${response.data.access_token}`;
         setLoginStatus(true);
       }
     } catch (error) {
@@ -33,26 +34,63 @@ const Login = ({
     }
   };
 
-  const logout = () => {
-    setLoginStatus(false);
-    setIsAuthenticated(false);
-    localStorage.removeItem("access_token");
-    setMessage("");
+  const logout = async () => {
+    try {
+      const token = localStorage.getItem("refresh_token");
+      const res = await axios.post(`${import.meta.env.VITE_URL}/auth/logout`, {
+        token,
+      });
+      if (res) {
+        setLoginStatus(false);
+        setIsAuthenticated(false);
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        delete axios.defaults.headers.common["Authorization"];
+        setMessage("");
+      }
+    } catch (error) {
+      console.log("Error auth: ", error.response);
+      setMessage(error.response.data.message);
+    }
   };
 
   const userAuthenticated = async () => {
+    setIsAuthenticated(false);
+    setMessage("");
     try {
-      const response = await axios.get("http://localhost:4000/auth/isUserAuth");
+      const response = await axios.get(
+        `${import.meta.env.VITE_URL}/auth/isUserAuth`
+      );
       if (response.status === 200) {
         setMessage(response.data);
         setIsAuthenticated(true);
         refreshing();
-      } else {
-        console.log(response.data.message);
-        setMessage(response.data.message);
       }
     } catch (error) {
       console.log("Error auth: ", error.response);
+      setMessage(error.response.data.message);
+    }
+  };
+
+  const refreshToken = async () => {
+    try {
+      const refreshToken = localStorage.getItem("refresh_token");
+      const response = await axios.post(
+        `${import.meta.env.VITE_URL}/auth/refreshtoken`,
+        { refreshToken }
+      );
+      setMessage(response.data.message);
+      console.log(response);
+      localStorage.setItem(
+        "access_token",
+        "Bearer " + response.data.new_access_token
+      );
+      axios.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${response.data.new_access_token}`;
+    } catch (error) {
+      console.log("Error auth: ", error.response);
+      setMessage(error.response.data.message);
     }
   };
 
@@ -78,11 +116,14 @@ const Login = ({
         />
       </div>
       <div className="btn">
-        <button onClick={login}>Login</button>
+        {!loginStatus && <button onClick={login}>Login</button>}
         {loginStatus && <button onClick={logout}>Logout</button>}
       </div>
       {loginStatus && (
-        <button onClick={userAuthenticated}>Check Authentication JWT</button>
+        <div className="btn">
+          <button onClick={userAuthenticated}>Check Auth JWT</button>
+          <button onClick={refreshToken}>Refresh Token JWT</button>
+        </div>
       )}
       <span>{message}</span>
     </div>
