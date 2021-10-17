@@ -10,19 +10,37 @@ const validate = (data, forCreation = true) => {
   }).validate(data, { abortEarly: false }).error;
 };
 
-const findByEmail = (email) => {
-  return db
-    .query("SELECT * FROM admin WHERE admin_email = ?", [email])
-    .then(([results]) => console.log("resToDb", results[0]) || results[0]);
+const findUsers = async () => {
+  try {
+    const users = await db.query("SELECT * FROM user");
+    console.log(users);
+    return users[0];
+  } catch (error) {
+    return Promise.reject(error);
+  }
 };
 
-const create = (email, hashedPassword) => {
-  return db
-    .query("INSERT INTO admin (admin_email, admin_password) VALUES (?,?)", [
+const findByEmail = async (email) => {
+  try {
+    const user = await db.query("SELECT * FROM user WHERE user_email = ?", [
       email,
-      hashedPassword,
-    ])
-    .then((results) => results);
+    ]);
+    console.log("findEmail", user[0]);
+    return user[0];
+  } catch (error) {
+    return Promise.reject(error);
+  }
 };
 
-module.exports = { validate, findByEmail, create };
+const create = async (email, hashedPassword) => {
+  try {
+    return await db.query(
+      "INSERT INTO user (user_email, user_password) VALUES (?,?)",
+      [email, hashedPassword]
+    );
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+module.exports = { validate, findUsers, findByEmail, create };

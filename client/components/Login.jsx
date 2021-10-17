@@ -4,6 +4,7 @@ import axios from "axios";
 const Login = ({ setLoginStatus, loginStatus }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
 
   const login = async () => {
     try {
@@ -33,6 +34,12 @@ const Login = ({ setLoginStatus, loginStatus }) => {
     try {
       const response = await axios.get("http://localhost:4000/auth/isUserAuth");
       console.log("res auth:", response);
+      if (response.status === 200) {
+        setMessage(response.data);
+      } else {
+        console.log(response.data.message);
+        setMessage(response.data.message);
+      }
     } catch (error) {
       console.log("error auth:", error.response);
     }
@@ -60,10 +67,11 @@ const Login = ({ setLoginStatus, loginStatus }) => {
           onChange={(e) => setPassword(e.target.value)}
         />
       </div>
-      <input type="button" value="Login" onClick={login} />
+      <button onClick={login}>Login</button>
       {loginStatus && (
         <button onClick={userAuthenticated}>Check Authentication JWT</button>
       )}
+      <span>{message}</span>
     </div>
   );
 };

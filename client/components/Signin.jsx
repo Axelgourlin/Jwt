@@ -50,7 +50,7 @@ const Signin = ({ refreshing }) => {
           onChange={(e) => setPassword(e.target.value)}
         />
       </div>
-      <input type="button" value="SignIn" onClick={singin} />
+      <button onClick={singin}>SignIn</button>
     </div>
   );
 };

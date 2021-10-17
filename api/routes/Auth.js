@@ -15,11 +15,9 @@ authRouter.get("/", verifyToken, async (req, res) => {
 
 authRouter.post("/signin", async (req, res) => {
   const { email, password } = req.body;
-  console.log("body signin:", email, password);
   try {
     const hashedPassword = await hashPassword(password);
     const results = await Auth.create(email, hashedPassword);
-    console.log(results);
     return res.status(200).json(results);
   } catch (error) {
     console.log(error);
@@ -30,13 +28,11 @@ authRouter.post("/signin", async (req, res) => {
 authRouter.post("/login", async (req, res) => {
   const { email, password } = req.body;
   try {
-    const user = await Auth.findUserWithEmail(email);
+    const user = await Auth.findByEmail(email);
     if (!user) throw new Error("WRONG_CREDENTIALS");
     const verifyedPassword = await verifyPassword(user.user_password, password);
     if (!verifyedPassword) throw new Error("WRONG_CREDENTIALS");
-    console.log("user", user);
     const accessToken = createToken(email, user.id);
-    console.log("token", accessToken);
 
     return res.status(200).json({
       auth: true,
