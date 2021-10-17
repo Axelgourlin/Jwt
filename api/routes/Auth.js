@@ -6,8 +6,6 @@ const {
   CreateRefreshToken,
   refreshToken,
   verifyToken,
-  StorageToken,
-  deleteToken,
 } = require("../services/Jwt");
 
 authRouter.post("/signin", async (req, res) => {
@@ -26,7 +24,7 @@ authRouter.post("/login", async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await Auth.findByEmail(email);
-    if (user.length <= 0) throw new Error("WRONG_CREDENTIALS");
+    if (!user || user.length <= 0) throw new Error("WRONG_CREDENTIALS");
     const verifyedPassword = await verifyPassword(user.user_password, password);
     if (!verifyedPassword) throw new Error("WRONG_CREDENTIALS");
     const access_token = createToken(email, user.id);

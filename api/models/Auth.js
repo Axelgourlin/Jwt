@@ -32,10 +32,11 @@ const findByEmail = async (email) => {
 
 const create = async (email, hashedPassword) => {
   try {
-    return await db.query(
+    const response = await db.query(
       "INSERT INTO user (user_email, user_password) VALUES (?,?)",
       [email, hashedPassword]
     );
+    return response[0];
   } catch (error) {
     return Promise.reject(error);
   }
@@ -43,10 +44,11 @@ const create = async (email, hashedPassword) => {
 
 const storageToken = async (token, user_email) => {
   try {
-    return await db.query(
+    const response = await db.query(
       "UPDATE user SET refresh_token = ? WHERE user_email = ?",
       [token, user_email]
     );
+    return response[0];
   } catch (error) {
     return Promise.reject(error);
   }

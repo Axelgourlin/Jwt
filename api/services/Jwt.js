@@ -41,7 +41,6 @@ const verifyToken = (req, res, next) => {
 
   jwt.verify(token, process.env.PRIVATE_KEY, (err, decoded) => {
     if (err) {
-      console.log(token);
       return res
         .status(401)
         .json({ auth: false, message: "Wrong Token/Token expired!" });

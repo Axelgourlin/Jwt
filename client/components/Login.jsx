@@ -28,9 +28,11 @@ const Login = ({
           "Authorization"
         ] = `Bearer ${response.data.access_token}`;
         setLoginStatus(true);
+        setMessage("Connected !");
       }
     } catch (error) {
       console.log("Error login: ", error.response);
+      setMessage(error.response.data.message);
     }
   };
 
