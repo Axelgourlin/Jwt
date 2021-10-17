@@ -1,6 +1,6 @@
 const authRouter = require("express").Router();
 const Auth = require("../models/auth");
-const { hashPassword, verifyPassword } = require("../services/hashPassword");
+const { hashPassword, verifyPassword } = require("../services/argon2");
 const { createToken, verifyToken } = require("../services/Jwt");
 
 authRouter.get("/", verifyToken, async (req, res) => {

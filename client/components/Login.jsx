@@ -5,8 +5,6 @@ const Login = ({ setLoginStatus, loginStatus }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // axios.defaults.withCredentials = true;
-
   const login = async () => {
     try {
       const body = { email: email, password: password };
