@@ -2,12 +2,13 @@ import { useState } from "react";
 import axios from "axios";
 
 const Signin = () => {
-  const [email, setEmail] = useState("");
+  const [ident, setIdent] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
 
-  const singin = async () => {
-    const body = { email: email, password: password };
+  const singin = async (e) => {
+    e.preventDefault();
+    const body = { ident: ident, password: password };
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_URL}/auth/signin`,
@@ -19,24 +20,30 @@ const Signin = () => {
       }
       if (response.data.affectedRows === 1) {
         setMessage("Successfully created account");
+        setTimeout(() => {
+          setMessage("");
+          setIdent("");
+          setPassword("");
+        }, 4000);
       }
     } catch (error) {
       console.log(error);
-      setMessage("Error creating account");
+      setMessage(error.response.data.message);
     }
   };
 
   return (
-    <div className="container">
+    <form className="container" onSubmit={(e) => singin(e)}>
       <h2>SignIn</h2>
-      <span>{message && message}</span>
       <div className="content-items">
-        <label htmlFor="email">Email :</label>
+        <label htmlFor="ident">Identifier :</label>
         <input
-          type="email"
-          name="email"
-          id="email"
-          onChange={(e) => setEmail(e.target.value)}
+          type="ident"
+          name="ident"
+          id="ident"
+          required
+          onChange={(e) => setIdent(e.target.value)}
+          value={ident}
         />
       </div>
       <div className="content-items">
@@ -45,11 +52,14 @@ const Signin = () => {
           type="password"
           name="password"
           id="password"
+          required
           onChange={(e) => setPassword(e.target.value)}
+          value={password}
         />
       </div>
-      <button onClick={singin}>SignIn</button>
-    </div>
+      <input type="submit" value="SignIn" />
+      <span>{message}</span>
+    </form>
   );
 };
 

@@ -32,9 +32,10 @@ function App() {
         refreshing={refreshing}
       />
       <Signin refreshing={refreshing} />
+      {isAuthenticated && <h3>List of Members :</h3>}
       <ul>
         {isAuthenticated &&
-          users.map((user) => <li key={user.id}>{user.user_email}</li>)}
+          users.map((user) => <li key={user.id}>{user.user_ident}</li>)}
       </ul>
     </div>
   );
