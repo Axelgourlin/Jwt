@@ -4,5 +4,8 @@
   "main": "./client/main.jsx",
   "repository": "git@github.com:Axelgourlin/Jwt.git",
   "author": "Axel Gourlin <gourlin.axel@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "start": "node .api/server.js"
+  }
 }
