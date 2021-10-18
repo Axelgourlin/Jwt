@@ -2,11 +2,10 @@ const connection = require("../config/db-config");
 const Joi = require("joi");
 const db = connection.promise();
 
-const validate = (data, forCreation = true) => {
-  const presence = forCreation ? "required" : "optional";
+const validate = (data) => {
   return Joi.object({
-    email: Joi.string().email().max(254).presence(presence),
-    password: Joi.string().max(255).presence(presence),
+    ident: Joi.string().max(254).required(),
+    password: Joi.string().max(255).required(),
   }).validate(data, { abortEarly: false }).error;
 };
 
@@ -19,10 +18,10 @@ const findUsers = async () => {
   }
 };
 
-const findByEmail = async (email) => {
+const findByIdent = async (ident) => {
   try {
-    const user = await db.query("SELECT * FROM user WHERE user_email = ?", [
-      email,
+    const user = await db.query("SELECT * FROM user WHERE user_ident = ?", [
+      ident,
     ]);
     return user[0][0];
   } catch (error) {
@@ -30,11 +29,11 @@ const findByEmail = async (email) => {
   }
 };
 
-const create = async (email, hashedPassword) => {
+const create = async (ident, hashedPassword) => {
   try {
     const response = await db.query(
-      "INSERT INTO user (user_email, user_password) VALUES (?,?)",
-      [email, hashedPassword]
+      "INSERT INTO user (user_ident, user_password) VALUES (?,?)",
+      [ident, hashedPassword]
     );
     return response[0];
   } catch (error) {
@@ -42,11 +41,11 @@ const create = async (email, hashedPassword) => {
   }
 };
 
-const storageToken = async (token, user_email) => {
+const storageToken = async (token, user_ident) => {
   try {
     const response = await db.query(
-      "UPDATE user SET refresh_token = ? WHERE user_email = ?",
-      [token, user_email]
+      "UPDATE user SET refresh_token = ? WHERE user_ident = ?",
+      [token, user_ident]
     );
     return response[0];
   } catch (error) {
@@ -81,7 +80,7 @@ const clearToken = async (token) => {
 module.exports = {
   validate,
   findUsers,
-  findByEmail,
+  findByIdent,
   findToken,
   create,
   storageToken,

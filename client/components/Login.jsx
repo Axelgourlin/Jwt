@@ -7,13 +7,13 @@ const Login = ({
   setIsAuthenticated,
   refreshing,
 }) => {
-  const [email, setEmail] = useState("");
+  const [ident, setIdent] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
 
   const login = async () => {
     try {
-      const body = { email: email, password: password };
+      const body = { ident: ident, password: password };
       const response = await axios.post(
         `${import.meta.env.VITE_URL}/auth/login`,
         body
@@ -100,12 +100,12 @@ const Login = ({
     <div className="container">
       <h2>Login</h2>
       <div className="content-items">
-        <label htmlFor="loginEmail">Email :</label>
+        <label htmlFor="loginident">Identifier :</label>
         <input
-          type="email"
-          name="loginEmail"
-          id="loginEmail"
-          onChange={(e) => setEmail(e.target.value)}
+          type="ident"
+          name="loginident"
+          id="loginident"
+          onChange={(e) => setIdent(e.target.value)}
         />
       </div>
       <div className="content-items">
