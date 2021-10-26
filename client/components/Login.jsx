@@ -1,15 +1,15 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 
-const Login = ({
-  loginStatus,
-  setLoginStatus,
-  setIsAuthenticated,
-  refreshing,
-}) => {
+import { Context } from "../context/Context";
+
+const Login = ({ setLoginStatus }) => {
   const [ident, setIdent] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+
+  const { dispatch, access_token } = useContext(Context);
 
   const login = async () => {
     try {
@@ -18,15 +18,13 @@ const Login = ({
         `${import.meta.env.VITE_URL}/auth/login`,
         body
       );
-      if (response.data.auth) {
-        localStorage.setItem(
-          "access_token",
-          "Bearer " + response.data.access_token
-        );
-        localStorage.setItem("refresh_token", response.data.refresh_token);
-        axios.defaults.headers.common[
-          "Authorization"
-        ] = `Bearer ${response.data.access_token}`;
+      if (response.data.access_token) {
+        dispatch({
+          type: "LOGIN_SUCCESS",
+          payload: response.data.access_token,
+        });
+        console.log("coucou", response.data);
+
         setLoginStatus(true);
         setMessage("Connected !");
       }
@@ -36,65 +34,30 @@ const Login = ({
     }
   };
 
-  const logout = async () => {
-    try {
-      const token = localStorage.getItem("refresh_token");
-      const res = await axios.post(`${import.meta.env.VITE_URL}/auth/logout`, {
-        token,
-      });
-      if (res) {
-        setLoginStatus(false);
-        setIsAuthenticated(false);
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("refresh_token");
-        delete axios.defaults.headers.common["Authorization"];
-        setMessage("");
-      }
-    } catch (error) {
-      console.log("Error auth: ", error.response);
-      setMessage(error.response.data.message);
-    }
-  };
-
-  const userAuthenticated = async () => {
-    setIsAuthenticated(false);
+  const logout = () => {
+    localStorage.removeItem("access_token");
+    delete axios.defaults.headers.common["Authorization"];
     setMessage("");
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_URL}/auth/isUserAuth`
-      );
-      if (response.status === 200) {
-        setMessage(response.data);
-        setIsAuthenticated(true);
-        refreshing();
-      }
-    } catch (error) {
-      console.log("Error auth: ", error.response);
-      setMessage(error.response.data.message);
-    }
+    dispatch({ type: "LOGOUT" });
   };
 
-  const refreshToken = async () => {
-    try {
-      const refreshToken = localStorage.getItem("refresh_token");
-      const response = await axios.post(
-        `${import.meta.env.VITE_URL}/auth/refreshtoken`,
-        { refreshToken }
-      );
-      setMessage(response.data.message);
-      console.log(response);
-      localStorage.setItem(
-        "access_token",
-        "Bearer " + response.data.new_access_token
-      );
-      axios.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${response.data.new_access_token}`;
-    } catch (error) {
-      console.log("Error auth: ", error.response);
-      setMessage(error.response.data.message);
-    }
-  };
+  // const userAuthenticated = async () => {
+  //   setIsAuthenticated(false);
+  //   setMessage("");
+  //   try {
+  //     const response = await axios.get(
+  //       `${import.meta.env.VITE_URL}/auth/isUserAuth`
+  //     );
+  //     if (response.status === 200) {
+  //       setMessage(response.data);
+  //       setIsAuthenticated(true);
+  //       refreshing();
+  //     }
+  //   } catch (error) {
+  //     console.log("Error auth: ", error.response);
+  //     setMessage(error.response.data.message);
+  //   }
+  // };
 
   return (
     <div className="container">
@@ -118,15 +81,10 @@ const Login = ({
         />
       </div>
       <div className="btn">
-        {!loginStatus && <button onClick={login}>Login</button>}
-        {loginStatus && <button onClick={logout}>Logout</button>}
+        {!access_token && <button onClick={login}>Login</button>}
+        {access_token && <button onClick={logout}>Logout</button>}
       </div>
-      {loginStatus && (
-        <div className="btn">
-          <button onClick={userAuthenticated}>Check Auth JWT</button>
-          <button onClick={refreshToken}>Refresh Token JWT</button>
-        </div>
-      )}
+      <Link to="/secure">Secure Page</Link>
       <span>{message}</span>
     </div>
   );

@@ -41,48 +41,9 @@ const create = async (ident, hashedPassword) => {
   }
 };
 
-const storageToken = async (token, user_ident) => {
-  try {
-    const response = await db.query(
-      "UPDATE user SET refresh_token = ? WHERE user_ident = ?",
-      [token, user_ident]
-    );
-    return response[0];
-  } catch (error) {
-    return Promise.reject(error);
-  }
-};
-
-const findToken = async (token) => {
-  try {
-    const response = await db.query(
-      "SELECT refresh_token FROM user WHERE refresh_token = ?",
-      [token]
-    );
-    return response[0][0];
-  } catch (error) {
-    return Promise.reject(error);
-  }
-};
-
-const clearToken = async (token) => {
-  try {
-    const response = await db.query(
-      "UPDATE user SET refresh_token = ? WHERE refresh_token = ?",
-      ["", token]
-    );
-    return response[0];
-  } catch (error) {
-    return Promise.reject(error);
-  }
-};
-
 module.exports = {
   validate,
   findUsers,
   findByIdent,
-  findToken,
   create,
-  storageToken,
-  clearToken,
 };
